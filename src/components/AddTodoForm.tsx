@@ -13,6 +13,7 @@ function AddTodoForm({ addTodo }: AddTodoFormProps) {
     const [desc, setDesc] = useState<string>('');
 
     const handleSubmit = (event: React.FormEvent) => {
+        event.preventDefault(); // Fix: Prevent default form submission behavior
         addTodo(title, desc);
         setTitle('');
         setDesc('');
@@ -25,6 +26,7 @@ function AddTodoForm({ addTodo }: AddTodoFormProps) {
                 <input
                     type="text"
                     placeholder="Provide a title for the new To Do"
+                    value={title} // Fix: Set the value of the input to track state
                     onChange={(e) => setTitle(e.target.value)}
                     required
                 />

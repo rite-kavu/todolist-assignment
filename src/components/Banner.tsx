@@ -23,14 +23,13 @@ const Banner: React.FC = () => {
         fetchImg();
 
         const handleResize = () => {
-            const bannerElement = document.querySelector('.banner');
-            bannerElement?.setAttribute('style', `background-image: url(${window.innerWidth > 800? hdImgUrl : imgUrl})`);
+            setCurrentImgUrl(window.innerWidth > 800 ? hdImgUrl : imgUrl); // Removed direct DOM manipulation
         };
 
         window.addEventListener('resize', handleResize);
 
-        handleResize();
-    }, []);
+        return () => { window.removeEventListener('resize', handleResize); }; // Fix: Cleanup event listener on component unmount
+    }, [hdImgUrl, imgUrl]); // Added dependencies to useEffect
 
     if (!currentImgUrl)
         return <p>Banner Loading...</p>;

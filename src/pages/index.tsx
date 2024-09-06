@@ -32,23 +32,23 @@ export default function Home() {
       isUrgent: false,
     };
 
-    todos.push(newTodo);
-    setTodos(todos);
+    setTodos([...todos, newTodo]) // Fix: Avoid mutating state directly
   };
 
   const deleteTodo = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id === id));
+    setTodos(todos.filter((todo) => todo.id !== id)); // Fix: Corrected to remove the todo with matching id
   };
 
   const toggleProperty = useCallback((id: number, property: keyof Pick<Todo, 'isCompleted' | 'isUrgent'>) => {
-    const updatedTodos = todos.map((todo) => {
-      if (todo.id === id) {
-        todo[property] = !todo[property] as boolean;
-      }
-      return todo;
-    });
-    setTodos(updatedTodos);
-  }, [setTodos]);
+    setTodos((prevTodos) => // Fix: Use functional update form to get the latest state
+      prevTodos.map((todo) => {
+        if (todo.id === id) {
+          return { ...todo, [property]: !todo[property] }; // Toggle property immutably
+        }
+        return todo;
+      })
+    );
+  }, []); // Fix: Removed todos from dependency array since we're using a functional state update
 
   const displayTodoList = (todoList:Todo[]) => {
     return (
@@ -62,17 +62,13 @@ export default function Home() {
   };
 
   const displayTodos = (displayUrgent: boolean) => {
-    return displayTodoList(todos.filter((x) => {
-      if (displayUrgent) {
-        return !x.isCompleted && x.isUrgent === displayUrgent;
-      } else {
-        return !x.isCompleted && x.isUrgent !== displayUrgent;
-      }
-    }));
+    const filteredTodos = todos.filter((x) => !x.isCompleted && x.isUrgent === displayUrgent); // Fix: Simplified and clarified filtering logic
+    return displayTodoList(filteredTodos);
   };
 
   const displayComplete = () => {
-    return displayTodoList(todos.filter((x) => x.isCompleted));
+    const completedTodos = todos.filter((x) => x.isCompleted); // Fix: Correct filtering of completed todos
+    return displayTodoList(completedTodos);
   };
 
   return (
